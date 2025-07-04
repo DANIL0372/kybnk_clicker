@@ -24,35 +24,6 @@ body {
     background-blend-mode: overlay;
 }
 
-html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-fullscreen-container {
-  height: 100vh;
-  width: 100vw;
-  background: #000; /* Пример фона */
-  display: flex;
-  flex-direction: column;
-}
-
-#close-button {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: rgba(0,0,0,0.5);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 20px;
-  z-index: 1000;
-}
 
 .app-container {
     width: 100%;
