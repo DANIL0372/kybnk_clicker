@@ -6,19 +6,26 @@ const balanceElement = document.getElementById('balance');
 const usernameElement = document.getElementById('username');
 const userTagElement = document.getElementById('userTag');
 const clickCounterElement = document.getElementById('clickCounter');
+const boostBtn = document.getElementById('boostBtn');
+const boostTimerElement = document.getElementById('boostTimer');
 const progressBar = document.getElementById('progressBar');
 const progressLevel = document.getElementById('progressLevel');
+const hourlyIncomeElement = document.getElementById('hourlyIncome');
 
 // Игровые переменные
 let coins = 0;
 let coinsPerClick = 1;
 let maxClicks = 100;
 let currentClicks = maxClicks;
+let boostActive = false;
+let boostMultiplier = 1;
+let boostTimeLeft = 0;
+let boostTimer = null;
 let level = 0;
 let levelProgress = 0;
-let lastUpdate = Date.now()
+let lastUpdate = Date.now();
 
-// Уровни
+// Уровни и прогресс
 const levels = [
     { required: 0,    tag: "NEWBIE",    title: "Новичок" },
     { required: 100,  tag: "BEGINNER",  title: "Начинающий" },
@@ -33,16 +40,6 @@ const levels = [
     { required: 1000, tag: "TITAN",     title: "Титан" },
     { required: 1100, tag: "SUPREME",   title: "Верховный" }
 ];
-
-// Функция для изменения имени пользователя
-function changeUsername() {
-    const newName = prompt('Введите ваше игровое имя:', usernameElement.textContent);
-    if (newName && newName.trim() !== '') {
-        const trimmedName = newName.trim();
-        usernameElement.textContent = trimmedName;
-        localStorage.setItem('playerName', trimmedName);
-    }
-}
 
 // Инициализация приложения
 function initApp() {
@@ -66,7 +63,7 @@ function initApp() {
 
         // Восстановление кликов
         const now = Date.now();
-        const minutesPassed = Math.floor((now - lastUpdate) / 60000);
+        const minutesPassed = Math.floor((now - lastUpdate) / 3000);
         const restoredClicks = Math.min(minutesPassed, maxClicks - currentClicks);
 
         if (restoredClicks > 0) {
@@ -77,6 +74,10 @@ function initApp() {
 
     // Назначаем обработчики событий
     clickArea.addEventListener('click', handleClick);
+    boostBtn.addEventListener('click', activateBoost);
+
+    // Назначаем обработчик для изменения имени
+    usernameElement.addEventListener('click', changeUsername);
 
     // Обновление интерфейса
     updateUI();
@@ -84,7 +85,7 @@ function initApp() {
     updateUserTag();
 
     // Запускаем восстановление кликов каждую минуту
-    setInterval(restoreClicks, 3000); // 60 секунд
+    setInterval(restoreClicks, 60000);
 
     console.log("App initialized successfully");
 }
@@ -94,10 +95,25 @@ function handleClick(event) {
     if (currentClicks <= 0) return;
 
     currentClicks--;
-    coins += coinsPerClick;
+    coins += coinsPerClick * boostMultiplier;
 
+    createClickEffect(event, coinsPerClick * boostMultiplier);
     updateLevelProgress();
     updateUI();
+}
+
+// Функция создания анимации клика
+function createClickEffect(event, amount) {
+    const effect = document.createElement('div');
+    effect.className = 'click-text-effect';
+    effect.textContent = `+${amount}`;
+    effect.style.left = `${event.clientX}px`;
+    effect.style.top = `${event.clientY}px`;
+    document.body.appendChild(effect);
+
+    setTimeout(() => {
+        effect.remove();
+    }, 1200);
 }
 
 // Обновление интерфейса
@@ -105,38 +121,6 @@ function updateUI() {
     balanceElement.textContent = formatNumber(coins);
     clickCounterElement.textContent = `${currentClicks}/${maxClicks}`;
     saveProgress();
-}
-
-// Функция показа уведомлений
-function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
-}
-
-// Восстановление кликов
-function restoreClicks() {
-    if (currentClicks < maxClicks) {
-        currentClicks++;
-        updateUI();
-    }
-}
-
-// Сохранение прогресса
-function saveProgress() {
-    const progress = {
-        coins,
-        currentClicks,
-        level,
-        levelProgress,
-        lastUpdate: Date.now()
-    };
-    localStorage.setItem('kybnkProgress', JSON.stringify(progress));
 }
 
 // Обновление тега пользователя
@@ -171,8 +155,78 @@ function updateLevelProgress() {
     levelProgress = Math.min(100, ((coins - currentLevelMin) / (nextLevelMin - currentLevelMin)) * 100);
 
     // Обновляем прогрессбар
-    progressBar.style.width = `${levelProgress}%`;
+    document.documentElement.style.setProperty('--progress', `${levelProgress}%`);
     progressLevel.textContent = `LEVEL ${level}`;
+}
+
+// Активация буста
+function activateBoost() {
+    if (boostActive || currentClicks < 10) return;
+
+    currentClicks -= 10;
+    boostActive = true;
+    boostMultiplier = 2;
+    boostTimeLeft = 30;
+    boostBtn.classList.add('active');
+
+    // Запускаем таймер
+    if (boostTimer) clearInterval(boostTimer);
+    boostTimer = setInterval(() => {
+        boostTimeLeft--;
+        boostTimerElement.textContent = `${boostTimeLeft}s`;
+
+        if (boostTimeLeft <= 0) {
+            clearInterval(boostTimer);
+            boostActive = false;
+            boostMultiplier = 1;
+            boostTimerElement.textContent = "BOOST";
+            boostBtn.classList.remove('active');
+        }
+    }, 1000);
+
+    updateUI();
+}
+
+// Восстановление кликов
+function restoreClicks() {
+    if (currentClicks < maxClicks) {
+        currentClicks++;
+        updateUI();
+    }
+}
+
+// Сохранение прогресса
+function saveProgress() {
+    const progress = {
+        coins,
+        currentClicks,
+        level,
+        levelProgress,
+        lastUpdate: Date.now()
+    };
+    localStorage.setItem('kybnkProgress', JSON.stringify(progress));
+}
+
+// Функция для изменения имени пользователя
+function changeUsername() {
+    const newName = prompt('Введите ваше игровое имя:', usernameElement.textContent);
+    if (newName && newName.trim() !== '') {
+        const trimmedName = newName.trim();
+        usernameElement.textContent = trimmedName;
+        localStorage.setItem('playerName', trimmedName);
+    }
+}
+
+// Функция показа уведомлений
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
 }
 
 // Форматирование чисел с разделителями
