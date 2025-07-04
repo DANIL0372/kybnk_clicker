@@ -2,7 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>KYBNK SHOW</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
@@ -13,8 +15,21 @@
             <div class="profile-section">
                 <img src="/static/img/profile.png" alt="Profile" class="profile-icon">
                 <div class="user-info">
-                    <div class="username" id="username">PLAYER</div>
+                    <div class="username editable" id="username" onclick="changeUsername()">PLAYER</div>
                     <div class="user-tag" id="userTag">NEWBIE=0/11</div>
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <div class="control-icon">
+                    <img src="/static/img/profile_2.png" alt="Profile">
+                </div>
+                <div class="control-icon">
+                    <img src="/static/img/settings.png" alt="Settings">
+                </div>
+                <div class="income-info">
+                    <img src="/static/img/dollar_2.png" alt="Income">
+                    <span id="hourlyIncome">+0/час</span>
                 </div>
             </div>
 
