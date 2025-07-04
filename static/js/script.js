@@ -16,6 +16,7 @@ let maxClicks = 100;
 let currentClicks = maxClicks;
 let level = 0;
 let levelProgress = 0;
+let lastUpdate = Date.now()
 
 // Уровни
 const levels = [
@@ -33,9 +34,46 @@ const levels = [
     { required: 1100, tag: "SUPREME",   title: "Верховный" }
 ];
 
+// Функция для изменения имени пользователя
+function changeUsername() {
+    const newName = prompt('Введите ваше игровое имя:', usernameElement.textContent);
+    if (newName && newName.trim() !== '') {
+        const trimmedName = newName.trim();
+        usernameElement.textContent = trimmedName;
+        localStorage.setItem('playerName', trimmedName);
+    }
+}
+
 // Инициализация приложения
 function initApp() {
     console.log("Initializing app...");
+
+    // Загрузка сохраненного имени
+    const savedName = localStorage.getItem('playerName');
+    if (savedName) {
+        usernameElement.textContent = savedName;
+    }
+
+    // Загрузка сохраненного прогресса
+    const savedProgress = localStorage.getItem('kybnkProgress');
+    if (savedProgress) {
+        const progress = JSON.parse(savedProgress);
+        coins = progress.coins || 0;
+        currentClicks = progress.currentClicks || maxClicks;
+        level = progress.level || 0;
+        levelProgress = progress.levelProgress || 0;
+        lastUpdate = progress.lastUpdate || Date.now();
+
+        // Восстановление кликов
+        const now = Date.now();
+        const minutesPassed = Math.floor((now - lastUpdate) / 60000);
+        const restoredClicks = Math.min(minutesPassed, maxClicks - currentClicks);
+
+        if (restoredClicks > 0) {
+            currentClicks += restoredClicks;
+            showNotification(`Восстановлено ${restoredClicks} кликов!`);
+        }
+    }
 
     // Назначаем обработчики событий
     clickArea.addEventListener('click', handleClick);
@@ -44,6 +82,9 @@ function initApp() {
     updateUI();
     updateLevelProgress();
     updateUserTag();
+
+    // Запускаем восстановление кликов каждую минуту
+    setInterval(restoreClicks, 3000); // 60 секунд
 
     console.log("App initialized successfully");
 }
@@ -63,6 +104,39 @@ function handleClick(event) {
 function updateUI() {
     balanceElement.textContent = formatNumber(coins);
     clickCounterElement.textContent = `${currentClicks}/${maxClicks}`;
+    saveProgress();
+}
+
+// Функция показа уведомлений
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Восстановление кликов
+function restoreClicks() {
+    if (currentClicks < maxClicks) {
+        currentClicks++;
+        updateUI();
+    }
+}
+
+// Сохранение прогресса
+function saveProgress() {
+    const progress = {
+        coins,
+        currentClicks,
+        level,
+        levelProgress,
+        lastUpdate: Date.now()
+    };
+    localStorage.setItem('kybnkProgress', JSON.stringify(progress));
 }
 
 // Обновление тега пользователя
