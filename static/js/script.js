@@ -1,7 +1,11 @@
 console.log("Script loaded!");
 
-// Инициализация Telegram Web App
-const tg = window.Telegram.WebApp;
+// Создайте свою кнопку "Закрыть" (скроет стандартную панель Telegram)
+const closeButton = document.getElementById('close-button'); // Добавьте эту кнопку в ваш HTML
+closeButton.addEventListener('click', () => tg.close());
+
+// Опционально: скрыть стандартную кнопку Telegram
+tg.MainButton.hide();
 
 // Основные элементы
 const clickArea = document.getElementById('clickArea');
