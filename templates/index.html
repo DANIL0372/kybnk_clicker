@@ -1,5 +1,20 @@
 <!DOCTYPE html>
 <html lang="ru">
+<script>
+// Фиктивный User-Agent для обхода проверки ngrok
+Object.defineProperty(navigator, 'userAgent', {
+    value: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+    configurable: false,
+    writable: false
+});
+
+// Альтернативный метод: добавить мета-тег
+const meta = document.createElement('meta');
+meta.name = "user-agent";
+meta.content = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
+document.head.appendChild(meta);
+</script>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.ngrok-free.app https://telegram.org; img-src 'self' data: https://*; connect-src 'self' https://*;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -84,5 +99,10 @@
     <!-- Подключаем скрипты -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="/static/js/script.js"></script>
+
+    <button id="resetButton" style="position:fixed; bottom:10px; left:10px; background:red; color:white; padding:5px 10px; z-index:1000;">
+        Сбросить прогресс
+    </button>
+
 </body>
 </html>
