@@ -6,25 +6,18 @@ const balanceElement = document.getElementById('balance');
 const usernameElement = document.getElementById('username');
 const userTagElement = document.getElementById('userTag');
 const clickCounterElement = document.getElementById('clickCounter');
-const boostBtn = document.getElementById('boostBtn');
-const boostTimerElement = document.getElementById('boostTimer');
 const progressBar = document.getElementById('progressBar');
 const progressLevel = document.getElementById('progressLevel');
-const hourlyIncomeElement = document.getElementById('hourlyIncome');
 
 // Игровые переменные
 let coins = 0;
 let coinsPerClick = 1;
 let maxClicks = 100;
 let currentClicks = maxClicks;
-let boostActive = false;
-let boostMultiplier = 1;
-let boostTimeLeft = 0;
-let boostTimer = null;
 let level = 0;
 let levelProgress = 0;
 
-// Уровни и прогресс
+// Уровни
 const levels = [
     { required: 0,    tag: "NEWBIE",    title: "Новичок" },
     { required: 100,  tag: "BEGINNER",  title: "Начинающий" },
@@ -44,21 +37,13 @@ const levels = [
 function initApp() {
     console.log("Initializing app...");
 
-    // Загрузка прогресса
-    loadProgress();
+    // Назначаем обработчики событий
+    clickArea.addEventListener('click', handleClick);
 
     // Обновление интерфейса
     updateUI();
     updateLevelProgress();
     updateUserTag();
-
-    // Назначаем обработчики событий
-    clickArea.addEventListener('click', handleClick);
-    boostBtn.addEventListener('click', activateBoost);
-    setupNameEditing();
-
-    // Восстановление кликов
-    setInterval(restoreClicks, 3000);
 
     console.log("App initialized successfully");
 }
@@ -70,30 +55,14 @@ function handleClick(event) {
     currentClicks--;
     coins += coinsPerClick;
 
-    createClickEffect(event, coinsPerClick);
     updateLevelProgress();
     updateUI();
-}
-
-// Функция создания анимации клика
-function createClickEffect(event, amount) {
-    const effect = document.createElement('div');
-    effect.className = 'click-text-effect';
-    effect.textContent = `+${amount}`;
-    effect.style.left = `${event.clientX}px`;
-    effect.style.top = `${event.clientY}px`;
-    document.body.appendChild(effect);
-
-    setTimeout(() => {
-        effect.remove();
-    }, 1200);
 }
 
 // Обновление интерфейса
 function updateUI() {
     balanceElement.textContent = formatNumber(coins);
     clickCounterElement.textContent = `${currentClicks}/${maxClicks}`;
-    saveProgress();
 }
 
 // Обновление тега пользователя
@@ -128,85 +97,8 @@ function updateLevelProgress() {
     levelProgress = Math.min(100, ((coins - currentLevelMin) / (nextLevelMin - currentLevelMin)) * 100);
 
     // Обновляем прогрессбар
-    document.documentElement.style.setProperty('--progress', `${levelProgress}%`);
+    progressBar.style.width = `${levelProgress}%`;
     progressLevel.textContent = `LEVEL ${level}`;
-}
-
-// Активация буста
-function activateBoost() {
-    if (boostActive || currentClicks < 10) return;
-
-    currentClicks -= 10;
-    boostActive = true;
-    coinsPerClick = 2;
-    boostTimeLeft = 30;
-    boostBtn.classList.add('active');
-
-    // Запускаем таймер
-    if (boostTimer) clearInterval(boostTimer);
-    boostTimer = setInterval(() => {
-        boostTimeLeft--;
-        boostTimerElement.textContent = `${boostTimeLeft}s`;
-
-        if (boostTimeLeft <= 0) {
-            clearInterval(boostTimer);
-            boostActive = false;
-            coinsPerClick = 1;
-            boostTimerElement.textContent = "BOOST";
-            boostBtn.classList.remove('active');
-        }
-    }, 1000);
-
-    updateUI();
-}
-
-// Восстановление кликов
-function restoreClicks() {
-    if (currentClicks < maxClicks) {
-        currentClicks++;
-        updateUI();
-    }
-}
-
-// Настройка редактирования имени
-function setupNameEditing() {
-    usernameElement.addEventListener('click', () => {
-        const newName = prompt('Введите ваше игровое имя:', usernameElement.textContent);
-        if (newName && newName.trim() !== '') {
-            const trimmedName = newName.trim();
-            usernameElement.textContent = trimmedName;
-            localStorage.setItem('playerName', trimmedName);
-        }
-    });
-}
-
-// Сохранение прогресса
-function saveProgress() {
-    const progress = {
-        coins,
-        currentClicks,
-        level,
-        levelProgress
-    };
-    localStorage.setItem('kybnkProgress', JSON.stringify(progress));
-}
-
-// Загрузка прогресса
-function loadProgress() {
-    const savedProgress = localStorage.getItem('kybnkProgress');
-    if (savedProgress) {
-        const progress = JSON.parse(savedProgress);
-        coins = progress.coins || 0;
-        currentClicks = progress.currentClicks || maxClicks;
-        level = progress.level || 0;
-        levelProgress = progress.levelProgress || 0;
-    }
-
-    // Загрузка имени игрока
-    const savedName = localStorage.getItem('playerName');
-    if (savedName) {
-        usernameElement.textContent = savedName;
-    }
 }
 
 // Форматирование чисел с разделителями
