@@ -1,7 +1,8 @@
 console.log("Script loaded!");
 
-// Инициализация Telegram Web App
 const tg = window.Telegram.WebApp;
+const userId = tg.initDataUnsafe.user?.id.toString();
+tg.expand();
 
 // Основные элементы
 const clickArea = document.getElementById('clickArea');
@@ -28,6 +29,77 @@ let hourlyIncome = 100000; // Начальный доход
 let level = 0;
 let levelProgress = 0;
 let clickRestoreInterval;
+
+let users = {}; // В реальном проекте используйте БД
+
+// Получение состояния пользователя
+req.query.userId = undefined;
+app.get('/user-state', (req, res) => {
+  const userId = req.query.userId;
+  const now = Date.now();
+
+  if (!users[userId]) {
+    // Первый запуск
+    users[userId] = {
+      clicks: 100,
+      lastUpdate: now
+    };
+    return res.json({ clicks: 100 });
+  }
+
+  // Рассчёт восстановленных кликов (1 клик/минуту)
+  const minutesPassed = Math.floor((now - users[userId].lastUpdate) / 60000);
+  const restoredClicks = Math.min(minutesPassed, 100 - users[userId].clicks);
+
+  // Обновление состояния
+  users[userId].clicks = Math.min(100, users[userId].clicks + restoredClicks);
+  users[userId].lastUpdate = now;
+
+  res.json({
+    clicks: users[userId].clicks,
+    restored: restoredClicks
+  });
+});
+
+// Обработка клика
+app.post('/click', (req, res) => {
+  const userId = req.body.userId;
+
+  if (users[userId] && users[userId].clicks > 0) {
+    users[userId].clicks--;
+    users[userId].lastUpdate = Date.now();
+    res.json({ success: true, clicks: users[userId].clicks });
+  } else {
+    res.status(400).json({ error: "No clicks available" });
+  }
+});
+
+// Получаем текущее состояние при загрузке
+async function initGame() {
+  const response = await fetch(`/user-state?userId=${userId}`);
+  const data = await response.json();
+
+  if (data.restored && data.restored > 0) {
+    showNotification(`Восстановлено ${data.restored} кликов!`);
+  }
+
+  updateClicksDisplay(data.clicks);
+}
+
+// При клике на монету
+async function handleCoinClick() {
+  const response = await fetch('/click', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId })
+  });
+
+  const result = await response.json();
+  if (result.success) {
+    addCoins(1); // Добавляем 1 монету за клик
+    updateClicksDisplay(result.clicks);
+  }
+}
 
 // Уровни и прогресс
 const levels = [
@@ -56,8 +128,6 @@ function initApp() {
         return;
     }
 
-    const tg = window.Telegram.WebApp;
-    tg.expand();
 
     // Основные элементы
     const clickArea = document.getElementById('clickArea');
@@ -93,9 +163,40 @@ function initApp() {
     let currentClicks = maxClicks;
     let level = 0;
     let levelProgress = 0;
+    let clickPower = 1; // Множитель клика
+    let baseCoinsPerClick = 1;
+    let bonusMultiplier = 0.07; // 7% бонус (если нужно)
+
+    function handleCoinClick() {
+      if (clicksLeft <= 0) return;
+
+      // Тратим 1 клик
+      spendClick(1);
+
+      // Добавляем монеты БЕЗ случайных бонусов
+      addCoins(clickPower);
+
+      // Обновляем интерфейс
+      updateUI();
+    }
+
+    // Базовая функция добавления монет
+    function addCoins(amount) {
+      coins += amount;
+      document.getElementById('coins-count').innerText = Math.floor(coins);
+    }
+
+    function getCoinsPerClick() {
+      return baseCoinsPerClick * (1 + bonusMultiplier);
+    }
+
+    // Затем в handleCoinClick:
+    addCoins(getCoinsPerClick());
 
     // Загрузка прогресса
     loadProgress();
+
+    document.getElementById('coins-count').innerText = Math.floor(coins);
 
     // Функция создания анимации
     function createClickEffect(event, amount) {
