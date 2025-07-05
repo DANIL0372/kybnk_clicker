@@ -5,5 +5,8 @@
       "use": "@vercel/python"
     }
   ],
-  "rewrites": [{ "source": "/(.*)", "destination": "/app.py" }]
+  "routes": [
+    { "src": "/static/(.*)", "dest": "/static/$1" },
+    { "src": "/(.*)", "dest": "/app.py" }
+  ]
 }
