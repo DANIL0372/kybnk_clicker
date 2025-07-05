@@ -6,6 +6,15 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+/* Гарантированное скрытие элементов до инициализации */
+[style*="display: none"] {
+    display: none !important;
+}
+
+:root {
+    --progress: 0%; /* Переменная для прогресс-бара */
+}
+
 body {
     font-family: 'Montserrat', 'Arial', sans-serif;
     color: white;
@@ -24,6 +33,16 @@ body {
     background-blend-mode: overlay;
 }
 
+body {
+    overflow-x: hidden;
+}
+
+/* Убираем отладочную плашку */
+.debug-info {
+    display: none !important;
+}
+
+
 .app-container {
     width: 100%;
     height: 100%;
@@ -38,6 +57,28 @@ body {
     backdrop-filter: blur(5px);
 }
 
+/* Добавьте это для полноэкранного режима */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Убираем скролл */
+body {
+    overflow: hidden;
+}
+
+/* Гарантируем, что контейнер занимает весь экран */
+.app-container {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+}
+
 /* Верхний блок */
 .header {
     display: flex;
@@ -45,16 +86,18 @@ body {
     background: rgba(0, 0, 0, 0.8);
     border-bottom: 2px solid #7eff0c;
     flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .profile-section {
     display: flex;
     align-items: center;
-    width: 100%;
+    flex: 1;
     margin-bottom: 10px;
 }
 
-.profile-icon {
+.profile-section img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -103,10 +146,11 @@ body {
 }
 
 .progress-section {
-    width: 60%;
+    flex: 2;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0 10px;
 }
 
 .progress-container {
@@ -121,7 +165,7 @@ body {
 
 .progress-bar {
     height: 100%;
-    width: var(--progress, 0%);
+    width: var(--progress);
     background: #7eff0c;
     border-radius: 10px;
     transition: width 0.5s ease;
@@ -140,7 +184,7 @@ body {
 }
 
 .controls-section {
-    width: 40%;
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -185,9 +229,11 @@ body {
 .game-area {
     flex: 1;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 20px 20px 50px;
+    position: relative;
 }
 
 .coin-container {
@@ -197,6 +243,7 @@ body {
     align-items: center;
     cursor: pointer;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+    margin-top: 40px; /* Отступ сверху для счетчика */
 }
 
 .coin {
@@ -210,14 +257,20 @@ body {
 }
 
 .balance-display {
-    font-size: 2.4rem;
-    top: 48%;
-}
-
-.balance-display img {
-    width: 40px;
-    margin-right: 10px;
-    filter: drop-shadow(0 0 5px rgba(255, 255, 0, 0.8));
+    position: absolute;
+    top: -40px; /* Смещаем счетчик выше монеты */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2.8rem; /* Чуть больше размер */
+    font-weight: 800; /* Более жирный шрифт */
+    color: #fc036c; /* Ярко-розовый цвет */
+    text-align: center;
+    width: 100%;
+    z-index: 10;
+    text-shadow: none; /* Убираем тень */
+    background: none; /* Убираем фон */
+    padding: 0; /* Убираем отступы */
+    pointer-events: none;
 }
 
 /* Панель статистики */
@@ -240,6 +293,10 @@ body {
     width: 24px;
     height: 24px;
     margin-right: 8px;
+}
+
+.click-info {
+    background: rgba(0, 100, 255, 0.4);
 }
 
 .boost-info {
@@ -302,14 +359,14 @@ body {
 
 .click-text-effect {
     position: fixed;
-    color: #7eff0c;
     font-size: 24px;
     font-weight: 800;
-    text-shadow: 0 0 8px rgba(126, 255, 12, 0.8);
     animation: textRise 1s ease-out forwards;
     pointer-events: none;
     z-index: 1000;
     user-select: none;
+    color: #fc036c; /* Устанавливаем нужный цвет */
+    text-shadow: 0 0 8px rgba(197, 0, 83); /* Убираем старую тень */
 }
 
 /* Уведомления */
@@ -335,20 +392,19 @@ body {
 }
 
 /* Адаптивность */
+/* Фикс для мобильного отображения */
 @media (max-width: 480px) {
-    .coin {
-        width: 190px;
-        height: 190px;
+    .app-container {
+        min-height: 100vh;
     }
 
-    .balance-display {
-        font-size: 2.4rem;
+    .header {
+        padding: 10px;
+        flex-wrap: nowrap;
     }
 
-    .nav-btn {
-        min-width: 70px;
-        font-size: 0.8rem;
-        padding: 5px 10px;
+    .progress-section {
+        width: 100%;
     }
 }
 
@@ -366,7 +422,7 @@ body {
         padding: 10px;
     }
 
-    .profile-icon {
+    .profile-section img {
         width: 40px;
         height: 40px;
     }
@@ -379,3 +435,53 @@ body {
         font-size: 0.75rem;
     }
 }
+
+/* Добавим анимацию для счета при изменении */
+@keyframes balancePulse {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.1); }
+    100% { transform: translateX(-50%) scale(1); }
+}
+
+.balance-display span {
+    font-family: 'Arial Black', 'Arial Bold', sans-serif;
+    letter-spacing: -1px;
+}
+
+/* Анимация восстановления кликов */
+@keyframes restoringPulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+.click-info.restoring {
+    animation: restoringPulse 1s infinite;
+    background: rgba(252, 3, 108, 0.2);
+    border: 1px solid #fc036c;
+}
+
+/* Добавьте в конец style.css */
+@keyframes logoPulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
+.splash-logo {
+    animation: logoPulse 2s infinite;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.splash-logo span {
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+.splash-logo span:nth-child(1) { animation-delay: 0.2s; }
+.splash-logo span:nth-child(2) { animation-delay: 0.4s; }
+.splash-logo span:nth-child(3) { animation-delay: 0.6s; }
