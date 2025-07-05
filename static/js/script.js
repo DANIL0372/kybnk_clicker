@@ -46,23 +46,16 @@ const levels = [
 
 // Инициализация приложения
 window.initApp = function() {
-    console.log("Initializing app...");
+    console.log("Initializing game...");
 
-    // Назначаем обработчики событий
-    clickArea.addEventListener('click', handleClick);
-    if (boostBtn) boostBtn.addEventListener('click', activateBoost);
-    if (usernameElement) usernameElement.addEventListener('click', changeUsername);
-
-    // Загрузка сохраненных данных
+    // Ваш код инициализации...
     loadGame();
-
-    // Обновление интерфейса
     updateUI();
     updateLevelProgress();
     updateUserTag();
 
-     console.log("App initialized successfully");
-};
+    console.log("Game initialized!");
+}
 
 // Добавим новую функцию для отображения UI
 function showGameUI() {
@@ -291,6 +284,11 @@ window.addEventListener('beforeunload', saveGame);
 
 // Функция для скрытия заставки
 function hideSplashScreen() {
+
+    console.log("Hiding splash screen...");
+    console.log("Splash element:", document.getElementById('splashScreen'));
+    console.log("App container:", document.querySelector('.app-container'));
+
     const splashScreen = document.getElementById('splashScreen');
     const appContainer = document.querySelector('.app-container');
 
@@ -314,12 +312,6 @@ function hideSplashScreen() {
 
 // Показываем заставку минимум 2 секунды перед запуском
 document.addEventListener('DOMContentLoaded', () => {
-
-    // Если функция уже не была вызвана
-    if (!window.appInitialized) {
-        initApp();
-        window.appInitialized = true;
-    }
 
     // Ждем загрузки всех ресурсов
     window.addEventListener('load', () => {
