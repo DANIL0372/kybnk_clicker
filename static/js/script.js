@@ -45,9 +45,9 @@ const levels = [
 ];
 
 // Инициализация приложения
-window.initApp = function() {
+function initApp() {
     console.log("Initializing app...");
-
+    
     // Проверка элементов
     if (!clickArea || !balanceElement) {
         console.error("Essential elements not found!");
@@ -67,7 +67,49 @@ window.initApp = function() {
     updateUserTag();
 
     console.log("App initialized successfully");
-};
+}
+
+// Функция скрытия заставки и показа основного интерфейса
+function hideSplashScreen() {
+    console.log("Hiding splash screen...");
+    const splashScreen = document.getElementById('splashScreen');
+    const appContainer = document.querySelector('.app-container');
+    
+    if (!splashScreen || !appContainer) {
+        console.error("Splash or app container not found!");
+        return;
+    }
+
+    // Плавное исчезновение заставки
+    splashScreen.style.opacity = '0';
+    
+    setTimeout(() => {
+        splashScreen.style.display = 'none';
+        appContainer.style.display = 'flex';
+        
+        setTimeout(() => {
+            appContainer.style.opacity = '1';
+            initApp(); // Инициализация игры после показа интерфейса
+        }, 50);
+    }, 1000);
+}
+
+// Обработка клика
+function handleClick(event) {
+    const now = Date.now();
+    if (currentClicks <= 0 || now - lastClickTime < 100) return;
+
+    lastClickTime = now;
+    currentClicks--;
+    coins += coinsPerClick * boostMultiplier;
+
+    createClickEffect(event, coinsPerClick * boostMultiplier);
+    updateLevelProgress();
+    updateUI();
+    saveGame();
+
+    startRestore();
+}
 
 // Обновление интерфейса
 function updateUI() {
@@ -114,23 +156,6 @@ function updateLevelProgress() {
 
     document.documentElement.style.setProperty('--progress', `${levelProgress}%`);
     progressLevel.textContent = `LEVEL ${level}`;
-}
-
-// Обработка клика
-function handleClick(event) {
-    const now = Date.now();
-    if (currentClicks <= 0 || now - lastClickTime < 100) return;
-
-    lastClickTime = now;
-    currentClicks--;
-    coins += coinsPerClick * boostMultiplier;
-
-    createClickEffect(event, coinsPerClick * boostMultiplier);
-    updateLevelProgress();
-    updateUI();
-    saveGame();
-
-    startRestore();
 }
 
 // Восстановление кликов
@@ -268,25 +293,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Показываем заставку минимум 2 секунды
     setTimeout(function() {
-        const splashScreen = document.getElementById('splashScreen');
-        const appContainer = document.querySelector('.app-container');
-        
-        if (splashScreen && appContainer) {
-            splashScreen.style.opacity = '0';
-            
-            setTimeout(() => {
-                splashScreen.style.display = 'none';
-                appContainer.style.display = 'flex';
-                
-                setTimeout(() => {
-                    appContainer.style.opacity = '1';
-                    
-                    // Инициализация игры
-                    if (typeof initApp === 'function') {
-                        initApp();
-                    }
-                }, 50);
-            }, 1000);
-        }
+        hideSplashScreen();
     }, 2000);
 });
