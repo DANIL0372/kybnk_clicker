@@ -6,8 +6,65 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <title>KYBNK SHOW</title>
-    <link rel="stylesheet" href="static/css/style.css">
+
+    <!-- Встроенные стили для гарантии работы -->
     <style>
+        /* Основные стили */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Гарантированное скрытие элементов до инициализации */
+        [style*="display: none"] {
+            display: none !important;
+        }
+
+        :root {
+            --progress: 0%; /* Переменная для прогресс-бара */
+        }
+
+        body {
+            font-family: 'Montserrat', 'Arial', sans-serif;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at center, #2a2a2a 0%, #1a1a1a 70%, #0a0a0a 100%),
+                linear-gradient(135deg, #0a3a0a 0%, #1a5a1a 25%, #2a2a2a 50%, #1a1a1a 75%, #0a0a0a 100%);
+            background-blend-mode: overlay;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            max-height: none;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 0;
+            overflow: hidden;
+            box-shadow: none;
+            backdrop-filter: blur(5px);
+        }
+
+        /* ... (все остальные стили из style.css) ... */
+
+        /* Заставка */
         .splash-screen {
             position: fixed;
             top: 0;
@@ -89,13 +146,13 @@
 
             <div class="controls-section">
                 <div class="control-icon">
-                    <img src="/static/img/profile.png" alt="Profile" class="Profile">
+                    <img src="static/img/profile.png" alt="Profile">
                 </div>
                 <div class="control-icon">
-                    <img src="/static/img/settings.png" alt="Settings" class="settings">
+                    <img src="static/img/settings.png" alt="Settings">
                 </div>
                 <div class="income-info">
-                    <img src="/static/img/dollar_2.png" alt="Income" class="dollar_2">
+                    <img src="static/img/dollar_2.png" alt="Income">
                     <span id="hourlyIncome">+0/час</span>
                 </div>
             </div>
@@ -110,7 +167,7 @@
 
         <main class="game-area">
             <div class="coin-container" id="clickArea">
-                <img src="/static/img/coin.png" alt="Coin" class="coin">
+                <img src="static/img/coin.png" alt="Coin" class="coin">
                 <div class="balance-display">
                     <span id="balance">0</span>
                 </div>
@@ -119,56 +176,80 @@
 
         <div class="stats-panel">
             <div class="click-info">
-                <img src="/static/img/click.png" alt="Clicks" class="click">
+                <img src="static/img/click.png" alt="Clicks">
                 <span id="clickCounter">100/100</span>
             </div>
 
             <div class="boost-info" id="boostBtn">
-                <img src="/static/img/boost-icon.png" alt="Boost" class="boost-icon">
+                <img src="static/img/boost-icon.png" alt="Boost">
                 <span id="boostTimer">BOOST</span>
             </div>
         </div>
 
         <nav class="nav-menu">
             <button class="nav-btn active" id="homeBtn">
-                <img src="/static/img/home.png" alt="Home" class="home">
+                <img src="static/img/home.png" alt="Home">
                 <span>HOME</span>
             </button>
             <button class="nav-btn" id="mineBtn">
-                <img src="/static/img/mine.png" alt="Mine" class="mine">
+                <img src="static/img/mine.png" alt="Mine">
                 <span>MINE</span>
             </button>
             <button class="nav-btn" id="friendsBtn">
-                <img src="/static/img/friends.png" alt="Friends" class="friends">
+                <img src="static/img/friends.png" alt="Friends">
                 <span>FRIENDS</span>
             </button>
         </nav>
     </div>
 
+    <!-- Скрипты -->
+    <script>
+        // Временная функция для отладки
+        function log(message) {
+            const el = document.createElement('div');
+            el.textContent = message;
+            el.style.position = 'fixed';
+            el.style.background = 'black';
+            el.style.color = 'white';
+            el.style.padding = '10px';
+            el.style.zIndex = '10000';
+            document.body.appendChild(el);
+        }
+    </script>
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="static/js/script.js" defer></script>
+    <script src="static/js/script.js"></script>
 
     <script>
         function hideSplashScreen() {
-            const splashScreen = document.getElementById('splashScreen');
-            const appContainer = document.querySelector('.app-container');
+            try {
+                const splashScreen = document.getElementById('splashScreen');
+                const appContainer = document.querySelector('.app-container');
 
-            // Плавное исчезновение заставки
-            splashScreen.style.opacity = '0';
-
-            setTimeout(() => {
-                splashScreen.style.display = 'none';
-                appContainer.style.display = 'flex'; // Изменено на flex
+                // Плавное исчезновение заставки
+                splashScreen.style.opacity = '0';
 
                 setTimeout(() => {
-                    appContainer.style.opacity = '1';
+                    splashScreen.style.display = 'none';
+                    appContainer.style.display = 'flex';
 
-                    // Инициализация игры
-                    if (typeof initApp === 'function') {
-                        initApp();
-                    }
-                }, 50);
-            }, 1000);
+                    setTimeout(() => {
+                        appContainer.style.opacity = '1';
+
+                        // Инициализация игры
+                        if (typeof initApp === 'function') {
+                            initApp();
+                        } else {
+                            log("initApp function not found!");
+                        }
+                    }, 50);
+                }, 1000);
+            } catch (error) {
+                log("Error in hideSplashScreen: " + error.message);
+                document.querySelector('.app-container').style.display = 'flex';
+                document.querySelector('.app-container').style.opacity = '1';
+                if (typeof initApp === 'function') initApp();
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
