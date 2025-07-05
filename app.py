@@ -9,15 +9,13 @@ app = Flask(__name__,
 def index():
     return render_template('index.html')
 
-# Правильный обработчик статики
 @app.route('/static/<path:path>')
 def serve_static(path):
     return send_from_directory('static', path)
 
-# Обработчик для всех путей SPA
 @app.route('/<path:path>')
 def serve_spa(path):
     return render_template('index.html')
 
-# WSGI-совместимый экспорт
-application = app
+if __name__ == '__main__':
+    app.run()
