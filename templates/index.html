@@ -7,13 +7,80 @@
     <meta name="mobile-web-app-capable" content="yes">
     <title>KYBNK SHOW</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 1s ease-out;
+        }
+
+        .splash-logo {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 4rem;
+            text-align: center;
+            color: #fc036c;
+            text-shadow: 0 0 20px rgba(252, 3, 108, 0.7);
+            margin-bottom: 2rem;
+            letter-spacing: -3px;
+        }
+
+        .splash-logo span {
+            display: block;
+            line-height: 1.2;
+        }
+
+        .loader {
+            width: 80px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loader-bar {
+            position: absolute;
+            height: 100%;
+            width: 0%;
+            background: #fc036c;
+            animation: loading 2s infinite;
+            box-shadow: 0 0 10px rgba(252, 3, 108, 0.5);
+        }
+
+        @keyframes loading {
+            0% { width: 0%; left: 0; }
+            50% { width: 100%; left: 0; }
+            100% { width: 0%; left: 100%; }
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Верхний блок -->
+    <!-- Заставка -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-logo">
+            <span>KYBNK</span>
+            <span>SHOW</span>
+        </div>
+        <div class="loader">
+            <div class="loader-bar"></div>
+        </div>
+    </div>
+
+    <!-- Основное приложение (изначально скрыто) -->
+    <div class="app-container" style="display: none; opacity: 0; transition: opacity 1s ease-in;">
         <header class="header">
             <div class="profile-section">
-                <img src="/static/img/profile.png" alt="Profile" class="profile-icon">
+                <img src="/static/img/profile.png" alt="Profile" class="Profile">
                 <div class="user-info">
                     <div class="username editable" id="username">PLAYER</div>
                     <div class="user-tag" id="userTag">NEWBIE=0/11</div>
@@ -22,13 +89,13 @@
 
             <div class="controls-section">
                 <div class="control-icon">
-                    <img src="/static/img/profile_2.png" alt="Profile">
+                    <img src="/static/img/profile.png" alt="Profile" class="Profile">
                 </div>
                 <div class="control-icon">
-                    <img src="/static/img/settings.png" alt="Settings">
+                    <img src="/static/img/settings.png" alt="Settings" class="settings">
                 </div>
                 <div class="income-info">
-                    <img src="/static/img/dollar_2.png" alt="Income">
+                    <img src="/static/img/dollar_2.png" alt="Income" class="dollar_2">
                     <span id="hourlyIncome">+0/час</span>
                 </div>
             </div>
@@ -41,7 +108,6 @@
             </div>
         </header>
 
-        <!-- Центральная игровая область -->
         <main class="game-area">
             <div class="coin-container" id="clickArea">
                 <img src="/static/img/coin.png" alt="Coin" class="coin">
@@ -51,38 +117,63 @@
             </div>
         </main>
 
-        <!-- Нижняя панель управления -->
         <div class="stats-panel">
             <div class="click-info">
-                <img src="/static/img/click.png" alt="Clicks">
+                <img src="/static/img/click.png" alt="Clicks" class="click">
                 <span id="clickCounter">100/100</span>
             </div>
 
             <div class="boost-info" id="boostBtn">
-                <img src="/static/img/boost-icon.png" alt="Boost">
+                <img src="/static/img/boost-icon.png" alt="Boost" class="boost-icon">
                 <span id="boostTimer">BOOST</span>
             </div>
         </div>
 
-        <!-- Нижнее меню -->
         <nav class="nav-menu">
             <button class="nav-btn active" id="homeBtn">
-                <img src="/static/img/home.png" alt="Home">
+                <img src="/static/img/home.png" alt="Home" class="home">
                 <span>HOME</span>
             </button>
             <button class="nav-btn" id="mineBtn">
-                <img src="/static/img/mine.png" alt="Mine">
+                <img src="/static/img/mine.png" alt="Mine" class="mine">
                 <span>MINE</span>
             </button>
             <button class="nav-btn" id="friendsBtn">
-                <img src="/static/img/friends.png" alt="Friends">
+                <img src="/static/img/friends.png" alt="Friends" class="friends">
                 <span>FRIENDS</span>
             </button>
         </nav>
     </div>
 
-    <!-- Подключаем скрипты -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="/static/js/script.js"></script>
+
+    <script>
+        function hideSplashScreen() {
+            const splashScreen = document.getElementById('splashScreen');
+            const appContainer = document.querySelector('.app-container');
+
+            splashScreen.style.opacity = '0';
+
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+                appContainer.style.display = 'flex';
+
+                setTimeout(() => {
+                    appContainer.style.opacity = '1';
+
+                    if (typeof initApp === 'function') {
+                        initApp();
+                    }
+                }, 50);
+            }, 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            window.addEventListener('load', function() {
+                setTimeout(hideSplashScreen, 2000);
+            });
+        });
+    </script>
 </body>
 </html>
