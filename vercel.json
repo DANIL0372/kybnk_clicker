@@ -1,18 +1,16 @@
 {
-  "builds": [
-    {
-      "src": "app.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
+  "builds": [{
+    "src": "api.py",
+    "use": "@vercel/python"
+  }],
+  "routes": [{
+    "src": "/static/(.*)",
+    "headers": {
+      "Cache-Control": "public, max-age=31536000, immutable"
     },
-    {
-      "src": "/(.*)",
-      "dest": "app.py"
-    }
-  ]
+    "dest": "/static/$1"
+  }, {
+    "src": "/(.*)",
+    "dest": "api.py"
+  }]
 }
