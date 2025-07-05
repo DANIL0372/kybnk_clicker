@@ -9,22 +9,22 @@ app = Flask(__name__,
 def index():
     return render_template('index.html')
 
-# Новый обработчик статики с коррекцией путей
+# Обработчики статики
+@app.route('/static/img/<filename>')
+def serve_img(filename):
+    return send_from_directory('static/img', filename)
+
+@app.route('/static/css/<filename>')
+def serve_css(filename):
+    return send_from_directory('static/css', filename)
+
+@app.route('/static/js/<filename>')
+def serve_js(filename):
+    return send_from_directory('static/js', filename)
+
+# Общий обработчик для остальной статики
 @app.route('/static/<path:subpath>')
 def serve_static(subpath):
-    @app.route('/static/img/<filename>')
-    def serve_img(filename):
-        return send_from_directory('static/img', filename)
-
-    @app.route('/static/css/<filename>')
-    def serve_css(filename):
-        return send_from_directory('static/css', filename)
-
-    @app.route('/static/js/<filename>')
-    def serve_js(filename):
-        return send_from_directory('static/js', filename)
-
-    # Разбиваем путь на тип ресурса и имя файла
     parts = subpath.split('/')
     if len(parts) > 1:
         resource_type = parts[0]
