@@ -5,9 +5,14 @@
       "use": "@vercel/python"
     }
   ],
-  "rewrites": [{ "source": "/(.*)", "destination": "/app.py" }],
-
-  "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next"
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
+  ]
 }
