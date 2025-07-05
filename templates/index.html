@@ -62,6 +62,12 @@
             50% { width: 100%; left: 0; }
             100% { width: 0%; left: 100%; }
         }
+        
+        /* Гарантированное скрытие элементов */
+        .app-container.hidden {
+            display: none !important;
+            opacity: 0 !important;
+        }
     </style>
 </head>
 <body>
@@ -76,8 +82,8 @@
         </div>
     </div>
 
-    <!-- Основное приложение (изначально скрыто) -->
-    <div class="app-container" style="display: none; opacity: 0; transition: opacity 1s ease-in;">
+    <!-- Основное приложение -->
+    <div class="app-container hidden" id="appContainer">
         <header class="header">
             <div class="profile-section">
                 <img src="/static/img/profile.png" alt="Profile">
@@ -89,13 +95,13 @@
 
             <div class="controls-section">
                 <div class="control-icon">
-                    <img src="/static/img/profile.png" alt="Profile" class="Profile">
+                    <img src="/static/img/profile.png" alt="Profile">
                 </div>
                 <div class="control-icon">
-                    <img src="/static/img/settings.png" alt="Settings" class="settings">
+                    <img src="/static/img/settings.png" alt="Settings">
                 </div>
                 <div class="income-info">
-                    <img src="/static/img/dollar_2.png" alt="Income" class="dollar_2">
+                    <img src="/static/img/dollar_2.png" alt="Income">
                     <span id="hourlyIncome">+0/час</span>
                 </div>
             </div>
@@ -119,33 +125,32 @@
 
         <div class="stats-panel">
             <div class="click-info">
-                <img src="/static/img/click.png" alt="Clicks" class="click">
+                <img src="/static/img/click.png" alt="Clicks">
                 <span id="clickCounter">100/100</span>
             </div>
 
             <div class="boost-info" id="boostBtn">
-                <img src="/static/img/boost-icon.png" alt="Boost" class="boost-icon">
+                <img src="/static/img/boost-icon.png" alt="Boost">
                 <span id="boostTimer">BOOST</span>
             </div>
         </div>
 
         <nav class="nav-menu">
             <button class="nav-btn active" id="homeBtn">
-                <img src="/static/img/home.png" alt="Home" class="home">
+                <img src="/static/img/home.png" alt="Home">
                 <span>HOME</span>
             </button>
             <button class="nav-btn" id="mineBtn">
-                <img src="/static/img/mine.png" alt="Mine" class="mine">
+                <img src="/static/img/mine.png" alt="Mine">
                 <span>MINE</span>
             </button>
             <button class="nav-btn" id="friendsBtn">
-                <img src="/static/img/friends.png" alt="Friends" class="friends">
+                <img src="/static/img/friends.png" alt="Friends">
                 <span>FRIENDS</span>
             </button>
         </nav>
     </div>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="/static/js/script.js" defer></script>
 </body>
 </html>
