@@ -1,17 +1,8 @@
-console.log("Script loaded!");
+console.log("Game script loaded!");
 
 // Основные элементы
-const clickArea = document.getElementById('clickArea');
-const balanceElement = document.getElementById('balance');
-const usernameElement = document.getElementById('username');
-const userTagElement = document.getElementById('userTag');
-const clickCounterElement = document.getElementById('clickCounter');
-const boostBtn = document.getElementById('boostBtn');
-const boostTimerElement = document.getElementById('boostTimer');
-const progressBar = document.getElementById('progressBar');
-const progressLevel = document.getElementById('progressLevel');
-const hourlyIncomeElement = document.getElementById('hourlyIncome');
-const restoreDelay = 5000; // 5 секунд
+let clickArea, balanceElement, usernameElement, userTagElement, clickCounterElement;
+let boostBtn, boostTimerElement, progressBar, progressLevel, hourlyIncomeElement;
 
 // Игровые переменные
 let coins = 0;
@@ -44,80 +35,62 @@ const levels = [
     { required: 1100, tag: "SUPREME",   title: "Верховный" }
 ];
 
+// Инициализация элементов
+function initElements() {
+    clickArea = document.getElementById('clickArea');
+    balanceElement = document.getElementById('balance');
+    usernameElement = document.getElementById('username');
+    userTagElement = document.getElementById('userTag');
+    clickCounterElement = document.getElementById('clickCounter');
+    boostBtn = document.getElementById('boostBtn');
+    boostTimerElement = document.getElementById('boostTimer');
+    progressBar = document.getElementById('progressBar');
+    progressLevel = document.getElementById('progressLevel');
+    hourlyIncomeElement = document.getElementById('hourlyIncome');
+}
+
 // Инициализация приложения
 function initApp() {
-    console.log("Initializing app...");
+    console.log("Initializing game...");
     
-    // Проверка элементов
+    initElements();
+    
     if (!clickArea || !balanceElement) {
-        console.error("Essential elements not found!");
+        console.error("Critical elements not found! Retrying in 500ms");
+        setTimeout(initApp, 500);
         return;
     }
+    
+    console.log("All elements found:", {
+        clickArea, balanceElement, usernameElement, userTagElement,
+        clickCounterElement, boostBtn, boostTimerElement,
+        progressBar, progressLevel, hourlyIncomeElement
+    });
 
     // Назначаем обработчики
     clickArea.addEventListener('click', handleClick);
     usernameElement.addEventListener('click', changeUsername);
     boostBtn.addEventListener('click', activateBoost);
-    console.log("Event listeners attached");
-
+    
     // Инициализация игрового состояния
     loadGame();
     updateUI();
     updateLevelProgress();
     updateUserTag();
 
-    console.log("App initialized successfully");
-}
-
-// Функция скрытия заставки и показа основного интерфейса
-function hideSplashScreen() {
-    console.log("Hiding splash screen...");
-    const splashScreen = document.getElementById('splashScreen');
-    const appContainer = document.querySelector('.app-container');
-    
-    if (!splashScreen || !appContainer) {
-        console.error("Splash or app container not found!");
-        return;
-    }
-
-    // Плавное исчезновение заставки
-    splashScreen.style.opacity = '0';
-    
-    setTimeout(() => {
-        splashScreen.style.display = 'none';
-        appContainer.style.display = 'flex';
-        
-        setTimeout(() => {
-            appContainer.style.opacity = '1';
-            initApp(); // Инициализация игры после показа интерфейса
-        }, 50);
-    }, 1000);
-}
-
-// Обработка клика
-function handleClick(event) {
-    const now = Date.now();
-    if (currentClicks <= 0 || now - lastClickTime < 100) return;
-
-    lastClickTime = now;
-    currentClicks--;
-    coins += coinsPerClick * boostMultiplier;
-
-    createClickEffect(event, coinsPerClick * boostMultiplier);
-    updateLevelProgress();
-    updateUI();
-    saveGame();
-
-    startRestore();
+    console.log("Game initialized successfully!");
 }
 
 // Обновление интерфейса
 function updateUI() {
-    if (!balanceElement || !clickCounterElement) return;
+    if (!balanceElement || !clickCounterElement) {
+        console.warn("UI elements not ready yet");
+        return;
+    }
     
     balanceElement.textContent = formatNumber(coins);
     clickCounterElement.textContent = `${currentClicks}/${maxClicks}`;
-
+    
     if (currentClicks < maxClicks) {
         clickCounterElement.classList.add('restoring');
     } else {
@@ -127,6 +100,8 @@ function updateUI() {
 
 // Обновление тега пользователя
 function updateUserTag() {
+    if (!userTagElement) return;
+    
     if (level >= levels.length) level = levels.length - 1;
     const levelTag = levels[level].tag;
     userTagElement.textContent = `${levelTag}=${level}/${levels.length-1}`;
@@ -134,6 +109,8 @@ function updateUserTag() {
 
 // Обновление прогресса уровня
 function updateLevelProgress() {
+    if (!progressBar || !progressLevel) return;
+    
     let newLevel = 0;
     for (let i = levels.length - 1; i >= 0; i--) {
         if (coins >= levels[i].required) {
@@ -156,6 +133,23 @@ function updateLevelProgress() {
 
     document.documentElement.style.setProperty('--progress', `${levelProgress}%`);
     progressLevel.textContent = `LEVEL ${level}`;
+}
+
+// Обработка клика
+function handleClick(event) {
+    const now = Date.now();
+    if (currentClicks <= 0 || now - lastClickTime < 100) return;
+
+    lastClickTime = now;
+    currentClicks--;
+    coins += coinsPerClick * boostMultiplier;
+
+    createClickEffect(event, coinsPerClick * boostMultiplier);
+    updateLevelProgress();
+    updateUI();
+    saveGame();
+
+    startRestore();
 }
 
 // Восстановление кликов
@@ -227,7 +221,7 @@ function saveGame() {
         currentClicks: currentClicks,
         level: level,
         lastUpdate: Date.now(),
-        username: usernameElement.textContent
+        username: usernameElement ? usernameElement.textContent : 'PLAYER'
     };
     localStorage.setItem('kybnkSave', JSON.stringify(gameData));
 }
@@ -241,7 +235,7 @@ function loadGame() {
         level = saveData.level || 0;
         lastUpdate = saveData.lastUpdate || Date.now();
 
-        if (saveData.username) {
+        if (saveData.username && usernameElement) {
             usernameElement.textContent = saveData.username;
         }
 
@@ -261,7 +255,9 @@ function loadGame() {
 
 // Смена имени пользователя
 function changeUsername() {
-    const newName = prompt('Введите ваше игровое имя:', usernameElement.textContent);
+    const newName = prompt('Введите ваше игровое имя:', 
+        usernameElement ? usernameElement.textContent : 'PLAYER');
+    
     if (newName && newName.trim() !== '') {
         usernameElement.textContent = newName.trim();
         saveGame();
@@ -287,12 +283,36 @@ function formatNumber(num) {
 setInterval(saveGame, 30000);
 window.addEventListener('beforeunload', saveGame);
 
+// Функция скрытия заставки и показа игры
+function showGameInterface() {
+    const splashScreen = document.getElementById('splashScreen');
+    const appContainer = document.getElementById('appContainer');
+    
+    if (!splashScreen || !appContainer) {
+        console.error("Splash or app container not found!");
+        return;
+    }
+    
+    console.log("Hiding splash screen and showing game interface...");
+    
+    // Плавное исчезновение заставки
+    splashScreen.style.opacity = '0';
+    
+    setTimeout(() => {
+        splashScreen.style.display = 'none';
+        appContainer.classList.remove('hidden');
+        
+        setTimeout(() => {
+            appContainer.style.opacity = '1';
+            initApp(); // Инициализация игры после показа интерфейса
+        }, 50);
+    }, 1000);
+}
+
 // Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded and parsed");
     
     // Показываем заставку минимум 2 секунды
-    setTimeout(function() {
-        hideSplashScreen();
-    }, 2000);
+    setTimeout(showGameInterface, 2000);
 });
