@@ -80,7 +80,7 @@
     <div class="app-container" style="display: none; opacity: 0; transition: opacity 1s ease-in;">
         <header class="header">
             <div class="profile-section">
-                <img src="/static/img/profile.png" alt="Profile" class="Profile">
+                <img src="static/img/profile.png" alt="Profile">
                 <div class="user-info">
                     <div class="username editable" id="username">PLAYER</div>
                     <div class="user-tag" id="userTag">NEWBIE=0/11</div>
@@ -153,15 +153,17 @@
             const splashScreen = document.getElementById('splashScreen');
             const appContainer = document.querySelector('.app-container');
 
+            // Плавное исчезновение заставки
             splashScreen.style.opacity = '0';
 
             setTimeout(() => {
                 splashScreen.style.display = 'none';
-                appContainer.style.display = 'flex';
+                appContainer.style.display = 'flex'; // Изменено на flex
 
                 setTimeout(() => {
                     appContainer.style.opacity = '1';
 
+                    // Инициализация игры
                     if (typeof initApp === 'function') {
                         initApp();
                     }
