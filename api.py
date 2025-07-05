@@ -9,10 +9,10 @@ app = Flask(__name__,
 def index():
     return render_template('index.html')
 
-# Упрощённый и корректный обработчик статики
-@app.route('/static/<path:subpath>')
-def serve_static(subpath):
-    return send_from_directory('static', subpath)
+# Правильный обработчик статики
+@app.route('/static/<path:path>')
+def serve_static(path):
+    return send_from_directory('static', path)
 
 # Обработчик для всех путей SPA
 @app.route('/<path:path>')
