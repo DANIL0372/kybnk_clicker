@@ -62,8 +62,7 @@
             50% { width: 100%; left: 0; }
             100% { width: 0%; left: 100%; }
         }
-        
-        /* Гарантированное скрытие элементов */
+
         .app-container.hidden {
             display: none !important;
             opacity: 0 !important;
@@ -86,7 +85,7 @@
     <div class="app-container hidden" id="appContainer">
         <header class="header">
             <div class="profile-section">
-                <img src="/static/img/profile.png" alt="Profile">
+                <img src="/static/img/profile.svg" alt="Profile" width="50" height="50">
                 <div class="user-info">
                     <div class="username editable" id="username">PLAYER</div>
                     <div class="user-tag" id="userTag">NEWBIE=0/11</div>
@@ -95,13 +94,13 @@
 
             <div class="controls-section">
                 <div class="control-icon">
-                    <img src="/static/img/profile.png" alt="Profile">
+                    <img src="/static/img/profile.svg" alt="Profile" width="24" height="24">
                 </div>
                 <div class="control-icon">
-                    <img src="/static/img/settings.png" alt="Settings">
+                    <img src="/static/img/settings.svg" alt="Settings" width="24" height="24">
                 </div>
                 <div class="income-info">
-                    <img src="/static/img/dollar_2.png" alt="Income">
+                    <img src="/static/img/dollar_2.svg" alt="Income" width="20" height="20">
                     <span id="hourlyIncome">+0/час</span>
                 </div>
             </div>
@@ -116,7 +115,7 @@
 
         <main class="game-area">
             <div class="coin-container" id="clickArea">
-                <img src="/static/img/coin.png" alt="Coin" class="coin">
+                <img src="/static/img/coin.svg" alt="Coin" class="coin" width="220" height="220">
                 <div class="balance-display">
                     <span id="balance">0</span>
                 </div>
@@ -125,27 +124,27 @@
 
         <div class="stats-panel">
             <div class="click-info">
-                <img src="/static/img/click.png" alt="Clicks">
+                <img src="/static/img/click.svg" alt="Clicks" width="24" height="24">
                 <span id="clickCounter">100/100</span>
             </div>
 
             <div class="boost-info" id="boostBtn">
-                <img src="/static/img/boost-icon.png" alt="Boost">
+                <img src="/static/img/boost-icon.svg" alt="Boost" width="24" height="24">
                 <span id="boostTimer">BOOST</span>
             </div>
         </div>
 
         <nav class="nav-menu">
             <button class="nav-btn active" id="homeBtn">
-                <img src="/static/img/home.png" alt="Home">
+                <img src="/static/img/home.svg" alt="Home" width="24" height="24">
                 <span>HOME</span>
             </button>
             <button class="nav-btn" id="mineBtn">
-                <img src="/static/img/mine.png" alt="Mine">
+                <img src="/static/img/mine.svg" alt="Mine" width="24" height="24">
                 <span>MINE</span>
             </button>
             <button class="nav-btn" id="friendsBtn">
-                <img src="/static/img/friends.png" alt="Friends">
+                <img src="/static/img/friends.svg" alt="Friends" width="24" height="24">
                 <span>FRIENDS</span>
             </button>
         </nav>
