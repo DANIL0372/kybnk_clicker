@@ -12,7 +12,7 @@ html, body {
     overflow: hidden;
     font-family: 'Montserrat', 'Arial', sans-serif;
     color: white;
-    background: 
+    background:
         radial-gradient(circle at center, #2a2a2a 0%, #1a1a1a 70%, #0a0a0a 100%),
         linear-gradient(135deg, #0a3a0a 0%, #1a5a1a 25%, #2a2a2a 50%, #1a1a1a 75%, #0a0a0a 100%);
     background-blend-mode: overlay;
@@ -63,8 +63,6 @@ html, body {
 }
 
 .profile-section img {
-    width: 50px;
-    height: 50px;
     border-radius: 50%;
     margin-right: 12px;
     border: 2px solid #7eff0c;
@@ -186,7 +184,6 @@ html, body {
 }
 
 .income-info img {
-    width: 20px;
     margin-right: 6px;
 }
 
@@ -212,13 +209,12 @@ html, body {
 }
 
 .coin {
-    width: 220px;
-    height: 220px;
-    transition: transform 0.1s;
+  transition: transform 0.1s;
+  transform-origin: center;
 }
 
 .coin-container:active .coin {
-    transform: scale(0.95);
+  animation: coinClick 0.3s ease;
 }
 
 .balance-display {
@@ -251,8 +247,6 @@ html, body {
 }
 
 .click-info img, .boost-info img {
-    width: 24px;
-    height: 24px;
     margin-right: 8px;
 }
 
@@ -301,8 +295,6 @@ html, body {
 }
 
 .nav-btn img {
-    width: 24px;
-    height: 24px;
     margin-bottom: 4px;
 }
 
@@ -382,8 +374,8 @@ html, body {
 
 @media (max-height: 700px) {
     .coin {
-        width: 180px;
-        height: 180px;
+        width: 180px !important;
+        height: 180px !important;
     }
 
     .balance-display {
@@ -395,8 +387,8 @@ html, body {
     }
 
     .profile-section img {
-        width: 40px;
-        height: 40px;
+        width: 40px !important;
+        height: 40px !important;
     }
 
     .username {
@@ -427,8 +419,29 @@ html, body {
     100% { opacity: 1; }
 }
 
+@keyframes coinClick {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(0.95) rotate(-5deg); }
+  50% { transform: scale(0.9) rotate(5deg); }
+  75% { transform: scale(0.95) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Свечение при наведении */
+.coin-container:hover .coin {
+  filter: drop-shadow(0 0 10px #7eff0c);
+  transition: filter 0.3s;
+}
+
 .click-info.restoring {
     animation: restoringPulse 1s infinite;
     background: rgba(252, 3, 108, 0.2);
     border: 1px solid #fc036c;
+}
+
+/* Важное исправление: гарантия видимости элементов */
+.header, .game-area, .stats-panel, .nav-menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
 }
