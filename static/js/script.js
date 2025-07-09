@@ -52,26 +52,22 @@ function initElements() {
 // Инициализация приложения
 function initApp() {
     console.log("Initializing game...");
-    
+
     initElements();
-    
+
     if (!clickArea || !balanceElement) {
         console.error("Critical elements not found! Retrying in 500ms");
         setTimeout(initApp, 500);
         return;
     }
-    
-    console.log("All elements found:", {
-        clickArea, balanceElement, usernameElement, userTagElement,
-        clickCounterElement, boostBtn, boostTimerElement,
-        progressBar, progressLevel, hourlyIncomeElement
-    });
+
+    console.log("All elements found");
 
     // Назначаем обработчики
     clickArea.addEventListener('click', handleClick);
     usernameElement.addEventListener('click', changeUsername);
     boostBtn.addEventListener('click', activateBoost);
-    
+
     // Инициализация игрового состояния
     loadGame();
     updateUI();
@@ -83,14 +79,11 @@ function initApp() {
 
 // Обновление интерфейса
 function updateUI() {
-    if (!balanceElement || !clickCounterElement) {
-        console.warn("UI elements not ready yet");
-        return;
-    }
-    
+    if (!balanceElement || !clickCounterElement) return;
+
     balanceElement.textContent = formatNumber(coins);
     clickCounterElement.textContent = `${currentClicks}/${maxClicks}`;
-    
+
     if (currentClicks < maxClicks) {
         clickCounterElement.classList.add('restoring');
     } else {
@@ -101,7 +94,7 @@ function updateUI() {
 // Обновление тега пользователя
 function updateUserTag() {
     if (!userTagElement) return;
-    
+
     if (level >= levels.length) level = levels.length - 1;
     const levelTag = levels[level].tag;
     userTagElement.textContent = `${levelTag}=${level}/${levels.length-1}`;
@@ -110,7 +103,7 @@ function updateUserTag() {
 // Обновление прогресса уровня
 function updateLevelProgress() {
     if (!progressBar || !progressLevel) return;
-    
+
     let newLevel = 0;
     for (let i = levels.length - 1; i >= 0; i--) {
         if (coins >= levels[i].required) {
@@ -255,9 +248,9 @@ function loadGame() {
 
 // Смена имени пользователя
 function changeUsername() {
-    const newName = prompt('Введите ваше игровое имя:', 
+    const newName = prompt('Введите ваше игровое имя:',
         usernameElement ? usernameElement.textContent : 'PLAYER');
-    
+
     if (newName && newName.trim() !== '') {
         usernameElement.textContent = newName.trim();
         saveGame();
@@ -287,21 +280,16 @@ window.addEventListener('beforeunload', saveGame);
 function showGameInterface() {
     const splashScreen = document.getElementById('splashScreen');
     const appContainer = document.getElementById('appContainer');
-    
-    if (!splashScreen || !appContainer) {
-        console.error("Splash or app container not found!");
-        return;
-    }
-    
-    console.log("Hiding splash screen and showing game interface...");
-    
+
+    if (!splashScreen || !appContainer) return;
+
     // Плавное исчезновение заставки
     splashScreen.style.opacity = '0';
-    
+
     setTimeout(() => {
         splashScreen.style.display = 'none';
         appContainer.classList.remove('hidden');
-        
+
         setTimeout(() => {
             appContainer.style.opacity = '1';
             initApp(); // Инициализация игры после показа интерфейса
@@ -311,8 +299,6 @@ function showGameInterface() {
 
 // Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM fully loaded and parsed");
-    
     // Показываем заставку минимум 2 секунды
     setTimeout(showGameInterface, 2000);
 });
