@@ -1,1 +1,0 @@
-# kybnk_clicker
