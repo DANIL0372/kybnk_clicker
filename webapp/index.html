@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин Кликер</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .balance-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .balance-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .balance-amount {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .click-area {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            width: 250px;
+            height: 250px;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .click-area:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .click-text {
+            font-size: 2em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .progress-section {
+            margin-bottom: 25px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+
+        .nav-tab.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .upgrade-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .upgrade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .upgrade-name {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .upgrade-level {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .upgrade-description {
+            opacity: 0.9;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .upgrade-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .upgrade-button:active {
+            transform: scale(0.95);
+        }
+
+        .upgrade-button:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
+        }
+
+        .reward-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+            z-index: 1000;
+            animation: fadeOut 1s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -100%) scale(0.8); }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Магазин Кликер</h1>
+            <p>Зарабатывай токены для скидок!</p>
+        </div>
+
+        <div class="balance-card">
+            <div class="balance-label">Ваш баланс</div>
+            <div class="balance-amount" id="balance">0</div>
+            <div>токенов</div>
+        </div>
+
+        <div class="click-area" id="clickButton">
+            <div class="click-text">КЛИК!</div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div>Уровень</div>
+                <div class="stat-value" id="level">1</div>
+            </div>
+            <div class="stat-card">
+                <div>Кликов</div>
+                <div class="stat-value" id="clicks">0</div>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-label">
+                <span>Прогресс до уровня</span>
+                <span id="levelProgressText">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="levelProgress" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-tab="game">🎮 Игра</div>
+            <div class="nav-tab" data-tab="upgrades">🏪 Улучшения</div>
+            <div class="nav-tab" data-tab="profile">👤 Профиль</div>
+        </div>
+
+        <!-- Вкладка Игры -->
+        <div class="tab-content active" id="game-tab">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div>Рефералы</div>
+                    <div class="stat-value" id="referrals">0</div>
+                </div>
+                <div class="stat-card">
+                    <div>Пассивный доход</div>
+                    <div class="stat-value" id="passiveIncome">0/ч</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Улучшений -->
+        <div class="tab-content" id="upgrades-tab">
+            <div class="upgrade-item">
+                <div class="upgrade-header">
+                    <div class="upgrade-name">🖱️ Улучшенный клик</div>
+                    <div class="upgrade-level">Ур. <span id="clickPowerLevel">1</span></div>
+                </div>
+                <div class="upgrade-description">+1 токен за каждый клик</div>
+                <button class="upgrade-button" onclick="buyUpgrade('click_power')" id="clickPowerButton">
+                    Купить за <span id="clickPowerPrice">100</span> токенов
+                </button>
+            </div>
+
+            <div class="upgrade-item">
+                <div class="upgrade-header">
+                    <div class="upgrade-name">💤 Пассивный доход</div>
+                    <div class="upgrade-level">Ур. <span id="passiveLevel">1</span></div>
+                </div>
+                <div class="upgrade-description">+1 токен в час</div>
+                <button class="upgrade-button" onclick="buyUpgrade('passive')" id="passiveButton">
+                    Купить за <span id="passivePrice">200</span> токенов
+                </button>
+            </div>
+
+            <div class="upgrade-item">
+                <div class="upgrade-header">
+                    <div class="upgrade-name">⚡ Автокликер</div>
+                    <div class="upgrade-level">Ур. <span id="autoclickLevel">0</span></div>
+                </div>
+                <div class="upgrade-description">Автоматические клики каждую минуту</div>
+                <button class="upgrade-button" onclick="buyUpgrade('autoclick')" id="autoclickButton">
+                    Купить за <span id="autoclickPrice">500</span> токенов
+                </button>
+            </div>
+        </div>
+
+        <!-- Вкладка Профиля -->
+        <div class="tab-content" id="profile-tab">
+            <div class="upgrade-item">
+                <div class="upgrade-header">
+                    <div class="upgrade-name">👥 Реферальная программа</div>
+                </div>
+                <div class="upgrade-description">
+                    Приглашайте друзей и получайте бонусы!
+                    <br>Вы: 100 токенов за друга
+                    <br>Друг: 50 токенов при регистрации
+                </div>
+                <button class="upgrade-button" onclick="showReferral()">
+                    Показать реферальную ссылку
+                </button>
+            </div>
+
+            <div class="upgrade-item">
+                <div class="upgrade-header">
+                    <div class="upgrade-name">💳 Обмен токенов</div>
+                </div>
+                <div class="upgrade-description">
+                    1000 токенов = 100 рублей скидки<br>
+                    5000 токенов = 600 рублей скидки<br>
+                    10000 токенов = 1300 рублей скидки
+                </div>
+                <button class="upgrade-button" onclick="showExchange()">
+                    Информация об обмене
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        let user = tg.initDataUnsafe?.user;
+        let userData = {};
+
+        // Инициализация Telegram WebApp
+        tg.expand();
+        tg.enableClosingConfirmation();
+
+        // Загрузка данных пользователя
+        async function loadUserData() {
+            try {
+                // В реальном приложении здесь будет запрос к вашему API
+                // Пока используем заглушку
+                userData = {
+                    balance: 100,
+                    level: 1,
+                    clicks: 0,
+                    referrals: 0,
+                    passive_income: 0,
+                    upgrades: {
+                        click_power: 1,
+                        passive: 1,
+                        autoclick: 0
+                    }
+                };
+                updateUI();
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        // Обработка клика
+        async function handleClick() {
+            try {
+                // Расчет награды
+                const baseReward = 1;
+                const clickPowerBonus = (userData.upgrades.click_power || 1) - 1;
+                const levelBonus = userData.level * 0.2;
+                const totalReward = baseReward + clickPowerBonus + levelBonus;
+
+                // Обновляем данные
+                userData.balance += totalReward;
+                userData.clicks += 1;
+
+                // Проверка повышения уровня
+                if (userData.clicks >= userData.level * 150) {
+                    userData.level += 1;
+                    showReward(`🎉 Уровень ${userData.level}!`);
+                }
+
+                updateUI();
+                showReward(`+${totalReward.toFixed(1)}`);
+
+                // Здесь будет отправка данных на сервер
+                // await saveUserData();
+
+            } catch (error) {
+                console.error('Error handling click:', error);
+            }
+        }
+
+        // Покупка улучшения
+        async function buyUpgrade(type) {
+            const prices = {
+                click_power: 100 * (userData.upgrades.click_power || 1),
+                passive: 200 * (userData.upgrades.passive || 1),
+                autoclick: 500 * ((userData.upgrades.autoclick || 0) + 1)
+            };
+
+            const price = prices[type];
+
+            if (userData.balance >= price) {
+                userData.balance -= price;
+
+                if (!userData.upgrades[type]) userData.upgrades[type] = 0;
+                userData.upgrades[type] += 1;
+
+                // Обновляем пассивный доход
+                if (type === 'passive') {
+                    userData.passive_income = userData.upgrades.passive;
+                }
+
+                updateUI();
+                showReward(`Улучшение куплено!`);
+
+                // Здесь будет отправка данных на сервер
+                // await saveUserData();
+            } else {
+                showReward('Недостаточно токенов!', true);
+            }
+        }
+
+        // Обновление интерфейса
+        function updateUI() {
+            // Основные данные
+            document.getElementById('balance').textContent = Math.floor(userData.balance);
+            document.getElementById('level').textContent = userData.level;
+            document.getElementById('clicks').textContent = userData.clicks.toLocaleString();
+            document.getElementById('referrals').textContent = userData.referrals || 0;
+            document.getElementById('passiveIncome').textContent = (userData.passive_income || 0) + '/ч';
+
+            // Прогресс бар
+            const progress = (userData.clicks % (userData.level * 150)) / (userData.level * 150) * 100;
+            document.getElementById('levelProgress').style.width = progress + '%';
+            document.getElementById('levelProgressText').textContent = Math.floor(progress) + '%';
+
+            // Улучшения
+            updateUpgradeUI('click_power', 100);
+            updateUpgradeUI('passive', 200);
+            updateUpgradeUI('autoclick', 500);
+        }
+
+        function updateUpgradeUI(type, basePrice) {
+            const level = userData.upgrades[type] || (type === 'autoclick' ? 0 : 1);
+            const price = basePrice * (type === 'autoclick' ? (level + 1) : level);
+
+            document.getElementById(`${type}Level`).textContent = level;
+            document.getElementById(`${type}Price`).textContent = price;
+
+            const button = document.getElementById(`${type}Button`);
+            if (userData.balance >= price) {
+                button.disabled = false;
+                button.style.background = 'linear-gradient(135deg, #FF6B6B, #FF8E53)';
+            } else {
+                button.disabled = true;
+                button.style.background = 'rgba(255, 255, 255, 0.2)';
+            }
+        }
+
+        // Показ награды
+        function showReward(text, isError = false) {
+            const popup = document.createElement('div');
+            popup.className = 'reward-popup';
+            popup.textContent = text;
+            popup.style.color = isError ? '#FF6B6B' : '#4CAF50';
+
+            document.body.appendChild(popup);
+
+            setTimeout(() => {
+                document.body.removeChild(popup);
+            }, 1000);
+        }
+
+        // Навигация по вкладкам
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Убираем активный класс у всех вкладок
+                    tabs.forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                    // Добавляем активный класс к выбранной вкладке
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                });
+            });
+        }
+
+        // Показ реферальной ссылки
+        function showReferral() {
+            const link = `https://t.me/your_bot_username?start=${user?.id || '123'}`;
+            tg.showPopup({
+                title: 'Реферальная ссылка',
+                message: `Ваша ссылка для приглашения:\n${link}`,
+                buttons: [{ type: 'ok' }]
+            });
+        }
+
+        // Показ информации об обмене
+        function showExchange() {
+            tg.showPopup({
+                title: 'Обмен токенов',
+                message: 'Для обмена токенов на скидки напишите нам в личные сообщения с указанием вашего ID и количества токенов.',
+                buttons: [{ type: 'ok' }]
+            });
+        }
+
+        // Инициализация
+        document.getElementById('clickButton').addEventListener('click', handleClick);
+        setupTabs();
+
+        // Загружаем данные при запуске
+        loadUserData();
+
+        // Авто-кликер (если куплен)
+        setInterval(() => {
+            if (userData.upgrades.autoclick > 0) {
+                const autoclickReward = userData.upgrades.autoclick * 0.5;
+                userData.balance += autoclickReward;
+                userData.clicks += userData.upgrades.autoclick;
+                updateUI();
+            }
+        }, 60000); // Каждую минуту
+
+    </script>
+</body>
+</html>
